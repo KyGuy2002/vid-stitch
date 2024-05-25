@@ -8,6 +8,7 @@ export default function Header() {
 
       <a
         href="https://github.com/KyGuy2002/vid-stitch"
+        target="_blank"
         className="ml-auto text-xl font-bold uppercase"
       >
         <img src="/fontawesome/github.svg" className="w-6"/>

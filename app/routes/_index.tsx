@@ -19,7 +19,7 @@ export default function Index() {
       
       <Header/>
 
-        <div className="max-w-xl mx-auto mt-8">
+      <div className="max-w-xl mx-auto mt-8">
 
         <h1
           className="text-center font-bold text-4xl text-gray-800 mb-3"
@@ -59,6 +59,8 @@ export default function Index() {
         </div>
 
       </div>
+
+      <p className="text-center mt-5 text-gray-500 text-sm">Created by <a className="underline" href="https://github.com/KyGuy2002" target="_blank">IEatBeans</a></p>
 
     </div>
   );
