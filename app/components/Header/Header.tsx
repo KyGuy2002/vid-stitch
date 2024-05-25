@@ -1,15 +1,17 @@
-import styles from "./header.module.scss";
+
 
 export default function Header() {
   return (
-    <header className={styles.header}>
-      
+    <header className="bg-sky-200 flex items-center px-8 py-2 rounded-xl">
 
-      <img src="/logo.webp"/>
+      <p className="text-blue-800 font-bold text-3xl">Vid<span className="text-black">Stitch</span></p>
 
-      <p>Vid<span>Stitch</span></p>
-
-      <a href=""></a>
+      <a
+        href="https://github.com/KyGuy2002/vid-stitch"
+        className="ml-auto text-xl font-bold uppercase"
+      >
+        <img src="/fontawesome/github.svg" className="w-6"/>
+      </a>
 
 
     </header>
