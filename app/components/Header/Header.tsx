@@ -2,7 +2,7 @@
 
 export default function Header() {
   return (
-    <header className="bg-sky-200 flex items-center px-8 py-2 rounded-xl">
+    <header className="bg-sky-200 flex items-center px-5 py-2 rounded-xl">
 
       <p className="text-blue-800 font-bold text-3xl">Vid<span className="text-black">Stitch</span></p>
 
