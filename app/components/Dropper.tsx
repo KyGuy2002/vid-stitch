@@ -8,6 +8,7 @@ export default function Dropper(props: { onSubmit: any, isLoaded: boolean }) {
 	const [ files, setFiles ] = useState<File[]>([]);
 	const [ thumbs, setThumbs ] = useState<string[]>([]);
 	const inputRef = useRef<HTMLInputElement>();
+	const dropAreaRef = useRef<HTMLDivElement>();
 
 	// Sequentially process the thumbnails to avoid crashing
 	useEffect(() => {
@@ -32,19 +33,62 @@ export default function Dropper(props: { onSubmit: any, isLoaded: boolean }) {
 		<form>
 
 			<label
-				className="block rounded-2xl bg-gray-300 w-full p-8 text-center font-bold uppercase text-xl text-gray-500
-				border-dashed border-4 border-gray-400 cursor-pointer"
-				htmlFor="file-upload"
+				ref={dropAreaRef}
+				className="rounded-2xl bg-gray-300 w-full px-4 py-7
+				border-dashed border-2 border-gray-400 cursor-pointer flex flex-col align-center justify-center gap-2"
+				htmlFor="file-picker"
+
+				onDragEnter={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					dropAreaRef.current!.style.backgroundColor = "#dbeafe"
+				}}
+				onDragOver={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					dropAreaRef.current!.style.backgroundColor = "#dbeafe"
+				}}
+				onDragLeave={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					dropAreaRef.current!.style.backgroundColor = ""
+				}}
+				onDrop={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					dropAreaRef.current!.style.backgroundColor = ""
+
+					setFiles((f) => [...f, ...Array.from(e.dataTransfer.files)]);
+				}}
+
 			>
 
-				Click here to select
+				<img src="/fontawesome/file-arrow-up-solid.svg" className="w-7 mx-auto"/>
+
+				<p className="text-gray-500 font-bold uppercase text-xl">Drag 'n' Drop here</p>
+
+				<div className="flex mx-auto gap-4 mt-3">
+					<label className="rounded-2xl border-blue-800 border-2 w-max px-5 py-1 text-blue-800 font-bold hover:bg-blue-300 cursor-pointer">
+						Add Folder
+
+						<input ref={inputRef} style={{ display: "none" }} type="file" multiple onChange={(evt) => {
+							if (evt.target.files?.length == 0) return;
+							setFiles((f) => [...f, ...Array.from(evt.target.files!)]);
+						}}/>
+
+					</label>
+					<label className="rounded-2xl border-blue-800 border-2 w-max px-5 py-1 text-blue-800 font-bold hover:bg-blue-300 cursor-pointer">
+						Add Files
+						
+						<input style={{ display: "none" }} type="file" id="file-picker" multiple onChange={(evt) => {
+							if (evt.target.files?.length == 0) return;
+							setFiles((f) => [...f, ...Array.from(evt.target.files!)]);
+						}}/>
+
+					</label>
+				</div>
 
 			</label>
-
-			<input ref={inputRef} style={{ display: "none" }} type="file" id="file-upload" name="files" multiple onChange={(evt) => {
-				if (evt.target.files?.length == 0) return;
-				setFiles((f) => [...f, ...Array.from(evt.target.files!)]);
-			}}/>
 
 			{files &&
 				<>{ // 10 or less files displays gallery
@@ -70,10 +114,6 @@ export default function Dropper(props: { onSubmit: any, isLoaded: boolean }) {
 
 			{!props.isLoaded &&
 				<CtaButton text="Downloading Code" disabled={true}/>
-			}
-
-			{(props.isLoaded && (!files || files?.length <= 1)) &&
-				<CtaButton text="Select Files" disabled={true}/>
 			}
 
 			<p className="mt-3 text-sm">All files must be same type, resolution, and length</p>

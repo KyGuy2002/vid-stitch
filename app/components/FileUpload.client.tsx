@@ -94,7 +94,7 @@ export default function FileUpload() {
 		<>
 
 			<div
-				className="bg-sky-200 p-8 rounded-3xl text-center"
+				className="bg-sky-200 p-6 rounded-3xl text-center"
 			>
 
 				{(stage == "LOADING_FFMPEG" || stage == "WAIT_PICK") &&
