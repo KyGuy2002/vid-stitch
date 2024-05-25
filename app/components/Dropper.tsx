@@ -14,7 +14,7 @@ export default function Dropper(props: { onSubmit: any, isLoaded: boolean }) {
 				htmlFor="file-upload"
 			>
 
-				Click or drop here
+				Click here to select
 
 			</label>
 

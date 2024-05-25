@@ -14,6 +14,9 @@ export default function FileUpload() {
 	async function loadFFmpeg() {
 		const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.4/dist/esm'
 		const ffmpeg = ffmpegRef.current;
+		ffmpeg.on('log', ({ message }) => {
+            console.log(message);
+        });
 		await ffmpeg.load({
 			coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
 			wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
@@ -38,12 +41,12 @@ export default function FileUpload() {
 			}
 
 			await ffmpeg.writeFile('list.txt', str);
-			await ffmpeg.exec(['-f', 'concat', '-i', 'list.txt', '-c', 'copy', 'output.mp4']);
+			await ffmpeg.exec(['-f', 'concat', '-i', 'list.txt', '-c', 'copy', 'output.mov']);
 
 
-			const data = await ffmpeg.readFile('output.mp4');
+			const data = await ffmpeg.readFile("output.mov")
 			
-			setFinalBlob(URL.createObjectURL(new Blob([data.buffer], {type: 'video/mp4'})));
+			setFinalBlob(URL.createObjectURL(new Blob([data.buffer], {type: 'video/mov'})));
 
 			setStage("DONE")
 		} catch (e: any) {
@@ -101,7 +104,7 @@ export default function FileUpload() {
 	async function download() {
 		const tempLink = document.createElement('a');
 		tempLink.href = finalBlob!;
-		tempLink.setAttribute('download', 'vidstitch-'+Date.now()+".mp4");
+		tempLink.setAttribute('download', 'vidstitch-'+Date.now()+".mov");
 		tempLink.click();
 	}
 
