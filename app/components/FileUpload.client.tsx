@@ -7,7 +7,7 @@ import { ProgressType } from "./ProgressType";
 
 export default function FileUpload() {
 	const [ stage, setStage ] = useState("LOADING_FFMPEG");
-	const [ error, setError ] = useState();
+	const [ error, setError ] = useState<string>();
 	const [ clipNo, setClipNo ] = useState<number>(0);
 	const [ totalClips, setTotalClips ] = useState<number>(0);
 	const [ finalBlob, setFinalBlob ] = useState<string>();
@@ -78,7 +78,8 @@ export default function FileUpload() {
 			setStage("DONE")
 			console.log("Done!")
 		} catch (e: any) {
-			setError(e);
+			console.log(e);
+			setError(e.toString());
 			ffmpeg.terminate();
 		}
 	}

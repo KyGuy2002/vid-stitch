@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CtaButton from "./CtaButton";
 import ThumbnailBox from "./ThumbnailBox";
 import getVideoCover from "~/utils/thumbnail";
@@ -7,6 +7,7 @@ export default function Dropper(props: { onSubmit: any, isLoaded: boolean }) {
 
 	const [ files, setFiles ] = useState<File[]>([]);
 	const [ thumbs, setThumbs ] = useState<string[]>([]);
+	const inputRef = useRef<HTMLInputElement>();
 
 	// Sequentially process the thumbnails to avoid crashing
 	useEffect(() => {
@@ -21,6 +22,12 @@ export default function Dropper(props: { onSubmit: any, isLoaded: boolean }) {
 		if (files.length <= 10) handle(); // Only do thumbnails if 10 or less
 	}, [files])
 
+	useEffect(() => {
+		if (!inputRef.current) return;
+		inputRef.current.setAttribute("directory", "");
+		inputRef.current.setAttribute("webkitdirectory", "");
+	}, [inputRef])
+
 	return (
 		<form>
 
@@ -34,7 +41,7 @@ export default function Dropper(props: { onSubmit: any, isLoaded: boolean }) {
 
 			</label>
 
-			<input style={{ display: "none" }} type="file" id="file-upload" name="files" multiple onChange={(evt) => {
+			<input ref={inputRef} style={{ display: "none" }} type="file" id="file-upload" name="files" multiple onChange={(evt) => {
 				if (evt.target.files?.length == 0) return;
 				setFiles((f) => [...f, ...Array.from(evt.target.files!)]);
 			}}/>
