@@ -3,34 +3,25 @@ import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { useEffect, useRef, useState } from "react";
 import Dropper from "./Dropper";
 import CtaButton from "./CtaButton";
+import { ProgressType } from "./ProgressType";
 
 export default function FileUpload() {
 	const [ stage, setStage ] = useState("LOADING_FFMPEG");
 	const [ error, setError ] = useState();
-	const [ clipNo, setClipNo ] = useState<number>();
+	const [ clipNo, setClipNo ] = useState<number>(0);
+	const [ totalClips, setTotalClips ] = useState<number>(0);
 	const [ finalBlob, setFinalBlob ] = useState<string>();
 	const ffmpegRef = useRef(new FFmpeg());
 
 
+	// TODO load again after terminate?
 	async function loadFFmpeg() {
-		const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.4/dist/esm'
+		const baseURL = 'https://unpkg.com/@ffmpeg/core-mt@0.12.6/dist/esm'
 		const ffmpeg = ffmpegRef.current;
-
-		let n = 0;
-		ffmpeg.on('log', ({ message }) => {
-			if (message.includes("Auto-inserting")) {
-				console.log("Starting clip: " + n)
-				if (n > 0) {
-					console.log("Deleting finished file: " + (n-1));
-					ffmpeg.deleteFile(`input${n-1}.mp4`);
-				}
-				n++;
-			}
-        });
-
 		await ffmpeg.load({
 			coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
 			wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+			workerURL: await toBlobURL(`${baseURL}/ffmpeg-core.worker.js`, 'text/javascript'),
 		});
 		setStage("WAIT_PICK")
 	}
@@ -38,49 +29,58 @@ export default function FileUpload() {
 
 	async function concat(files: File[]) {
 		const ffmpeg = ffmpegRef.current;
+		setTotalClips(files.length);
+
+
+		// Setup logger
+		setClipNo((i) => 0);
+		ffmpeg.on('log', ({ message }) => {
+			if (message.includes("Auto-inserting")) {
+				setClipNo((i) => i+1);
+			}
+        });
+
+
 		try {
-			setStage("PROCESSING")
+			setStage("LOADING_FILES")
 
 
 			let str = "";
 			console.log("Loading files into VFS...")
 			let n = 0;
 			for (let i = 0; i < files.length; i++) {
-				console.log("Loading clip: " + n);
- 
 				str = str + `file 'input${i}.mp4'\n`;
 
-				await writeFile(ffmpeg, files, n);
+				// Write file
+				const url = URL.createObjectURL(files[i]);
+				await ffmpeg.writeFile(`input${i}.mp4`, await fetchFile(url));
+				URL.revokeObjectURL(url);
+
+				setClipNo((i) => i+1);
+
 				n++;
 			}
-			console.log("Loaded all clips.  Starting Processing...")
+			setClipNo((i) => 0);
+
+			setStage("PROCESSING")
+
+			console.log("Starting Processing...")
 
 			await ffmpeg.writeFile('list.txt', str);
 			await ffmpeg.exec(['-f', 'concat', '-i', 'list.txt', '-c', 'copy', 'output.mov']);
 
 
-			console.log("1-STAGE!!!!!!!")
 			const data: any = await ffmpeg.readFile("output.mov")
 			ffmpeg.terminate();
-			console.log("2-STAGE!!!!!!!")
 			
 			setFinalBlob(URL.createObjectURL(new Blob([data.buffer], {type: 'video/mov'})));
-			console.log("3-STAGE!!!!!!!")
 
 			setStage("DONE")
 			console.log("Done!")
 		} catch (e: any) {
-			// setError(e);
-			console.log(e)
+			setError(e);
 			ffmpeg.terminate();
 		}
-	}
-
-
-	async function writeFile(ffmpeg: FFmpeg, files: File[], i: number) {
-		const url = URL.createObjectURL(files[i]);
-		await ffmpeg.writeFile(`input${i}.mp4`, await fetchFile(url));
-		URL.revokeObjectURL(url);
 	}
 
 
@@ -100,11 +100,20 @@ export default function FileUpload() {
 					<Dropper onSubmit={(files: File[]) => concat(files)} isLoaded={stage != "LOADING_FFMPEG"}/>
 				}
 
-				{stage == "PROCESSING" &&
+				{(stage == "PROCESSING" || stage == "LOADING_FILES") &&
 					<>
 						{!error && <>
 							<p className="font-bold text-lg">Video Processing</p>
 							<p className="mb-8">Your device is currently processing the video locally.</p>
+
+							<div className="bg-blue-100 rounded-3xl p-5 flex flex-col gap-2 mb-5">
+
+								<ProgressType label="Loading Files" current={clipNo} total={totalClips} done={stage == "PROCESSING"} notStarted={false}/>
+								<ProgressType label="Processing" current={clipNo} total={totalClips} done={clipNo == totalClips} notStarted={stage == "LOADING_FILES"}/>
+								<ProgressType label="Finishing Up" current={clipNo} total={totalClips} done={false} notStarted={clipNo != totalClips}/>
+
+							</div>
+
 							<CtaButton text="Cancel" sub={true} onClick={() => window.location.reload()}/>
 						</>}
 						{error && <>

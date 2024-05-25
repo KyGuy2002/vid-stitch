@@ -7,6 +7,7 @@ import {
 } from "@remix-run/react";
 
 import stylesheet from "~/tailwind.css?url";
+import Header from "./components/Header/Header";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -19,8 +20,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="p-2 h-dvh">
-        {children}
+      <body className="p-2 pb-5 min-h-dvh">
+      
+        <Header/>
+
+        <div className="max-w-xl mx-auto mt-8">
+          {children}
+        </div>
+
+        <p className="text-center mt-5 text-gray-500 text-sm">Created by <a className="underline" href="https://github.com/KyGuy2002" target="_blank">IEatBeans</a></p>
+
         <ScrollRestoration />
         <Scripts />
       </body>

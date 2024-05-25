@@ -36,6 +36,9 @@ export default async function handleRequest(
   }
 
   responseHeaders.set("Content-Type", "text/html");
+  // These headers required for FFmpeg.wasm multithread
+  responseHeaders.set("Cross-Origin-Opener-Policy", "same-origin");
+  responseHeaders.set("Cross-Origin-Embedder-Policy", "require-corp")
   return new Response(body, {
     headers: responseHeaders,
     status: responseStatusCode,

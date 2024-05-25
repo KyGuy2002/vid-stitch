@@ -16,53 +16,48 @@ export const meta: MetaFunction = () => {
 
 export default function Index() {
   return (
-    <div>
-      
-      <Header/>
+    <>
+      <h1
+        className="text-center font-bold text-4xl text-gray-800 mb-3"
+      >
+        <span className="text-blue-800">Free</span> & <span className="text-blue-800">Local</span> Video Stitcher
+      </h1>
 
-      <div className="max-w-xl mx-auto mt-8">
+      <p
+        className="text-center mb-5"
+      >
+        Everything is done on your device, making VidStitch completely free!  No uploading or cloud processing is needed.
+      </p>
 
-        <h1
-          className="text-center font-bold text-4xl text-gray-800 mb-3"
-        >
-          <span className="text-blue-800">Free</span> & <span className="text-blue-800">Local</span> Video Stitcher
-        </h1>
-
-        <p
-          className="text-center mb-5"
-        >
-          Everything is done on your device, making VidStitch completely free!  No uploading or cloud processing is needed.
-        </p>
-
-        {/* NOTE: For some reason this needs the .client.tsx AND the ClientOnly or else it explodes... */}
-        <ClientOnly fallback={<div className="bg-sky-200 p-8 rounded-3xl" style={{ minHeight: "270px" }}></div>}>
-          {() => <FileUpload/>}
-        </ClientOnly>
+      {/* NOTE: For some reason this needs the .client.tsx AND the ClientOnly or else it explodes... */}
+      <ClientOnly fallback={<div className="bg-sky-200 p-8 rounded-3xl" style={{ minHeight: "270px" }}></div>}>
+        {() => <FileUpload/>}
+      </ClientOnly>
 
 
-        <div className="flex mt-5 gap-5">
+      <div className="flex mt-5 gap-5 flex-wrap basis-0">
 
-          <div className="bg-sky-200 px-4 py-3 rounded-3xl">
-            <p className="font-bold flex align-center gap-1.5 w-max"><img src="/fontawesome/server-solid.svg" className="w-4 inline"/> 100% Local</p>
-            <p className="text-sm">Nothing leaves this device.</p>
-          </div>
+        <div className="bg-sky-200 px-4 py-3 rounded-3xl flex-grow basis-0 min-w-60">
+          <p className="font-bold flex align-center gap-1.5"><img src="/fontawesome/server-solid.svg" className="w-4 inline"/> 100% Local</p>
+          <p className="text-sm">Nothing leaves this device.</p>
+        </div>
 
-          <div className="bg-sky-200 px-4 py-3 rounded-3xl">
-            <p className="font-bold flex align-center gap-1.5 w-max"><img src="/fontawesome/cloud-arrow-up-solid.svg" className="w-4 inline"/> No Cloud</p>
-            <p className="text-sm">Cloud servers are not used.</p>
-          </div>
+        <div className="bg-sky-200 px-4 py-3 rounded-3xl flex-grow basis-0 min-w-60">
+          <p className="font-bold flex align-center gap-1.5"><img src="/fontawesome/cloud-arrow-up-solid.svg" className="w-4 inline"/> No Cloud</p>
+          <p className="text-sm">Cloud servers are not used.</p>
+        </div>
 
-          <div className="bg-sky-200 px-4 py-3 rounded-3xl">
-            <p className="font-bold flex align-center gap-1.5 w-max"><img src="/fontawesome/dollar-sign-solid.svg" className="w-2.5 inline"/> Free</p>
-            <p className="text-sm">Service is 100% free.</p>
-          </div>
+        <div className="bg-sky-200 px-4 py-3 rounded-3xl flex-grow basis-0 min-w-60">
+          <p className="font-bold flex align-center gap-1.5"><img src="/fontawesome/dollar-sign-solid.svg" className="w-2.5 inline"/> Free</p>
+          <p className="text-sm">Service is 100% free.</p>
+        </div>
 
+        <div className="bg-sky-200 px-4 py-3 rounded-3xl flex-grow basis-0 min-w-60">
+          <p className="font-bold flex align-center gap-1.5"><img src="/fontawesome/bolt-solid.svg" className="w-2.5 inline"/> Lightning Fast</p>
+          <p className="text-sm">No uploads or downloads.</p>
         </div>
 
       </div>
-
-      <p className="text-center mt-5 text-gray-500 text-sm">Created by <a className="underline" href="https://github.com/KyGuy2002" target="_blank">IEatBeans</a></p>
-
-    </div>
+    </>
   );
 }

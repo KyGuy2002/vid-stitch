@@ -11,21 +11,21 @@ export default function Dropper(props: { onSubmit: any, isLoaded: boolean }) {
 	// Sequentially process the thumbnails to avoid crashing
 	useEffect(() => {
 		async function handle() {
-			setThumbs((t) => []);
 
 			for (let i = 0; i < files.length; i++) {
 				const url = URL.createObjectURL(await getVideoCover(files[i]));
 				setThumbs((t) => [...t, url])
 			}
 		}
-		handle();
+		setThumbs((t) => []);
+		if (files.length <= 10) handle(); // Only do thumbnails if 10 or less
 	}, [files])
 
 	return (
 		<form>
 
 			<label
-				className="block rounded-2xl bg-gray-300 w-full p-10 text-center font-bold uppercase text-xl text-gray-500
+				className="block rounded-2xl bg-gray-300 w-full p-8 text-center font-bold uppercase text-xl text-gray-500
 				border-dashed border-4 border-gray-400 cursor-pointer"
 				htmlFor="file-upload"
 			>
@@ -40,13 +40,21 @@ export default function Dropper(props: { onSubmit: any, isLoaded: boolean }) {
 			}}/>
 
 			{files &&
-				<div className="flex gap-2 mt-2 overflow-x-auto">
+				<>{ // 10 or less files displays gallery
+					files.length <= 10 &&
+						<div className="flex gap-2 mt-2 overflow-x-auto hide-scrollbar">
 
-					{files.map((f, i) =>
-						<ThumbnailBox name={f.name} thumb={thumbs[i]}/>
-					)}
+							{files.map((f, i) =>
+								<ThumbnailBox key={f.name} name={f.name} thumb={thumbs[i]}/>
+							)}
 
-				</div>
+						</div>
+				}
+				{ // More than 10 just says total with 1 thumbnail
+					files.length > 10 &&
+						<p className="font-semibold text-sm mt-1.5">{files.length} files selected</p>
+				}
+				</>
 			}
 
 			{(props.isLoaded && (files && files.length > 1)) && 
