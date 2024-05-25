@@ -1,4 +1,5 @@
 import type { MetaFunction } from "@remix-run/cloudflare";
+import { useEffect } from "react";
 import { ClientOnly } from "remix-utils/client-only";
 import FileUpload from "~/components/FileUpload.client";
 import Header from "~/components/Header/Header";

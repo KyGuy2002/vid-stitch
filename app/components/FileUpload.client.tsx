@@ -7,6 +7,7 @@ import CtaButton from "./CtaButton";
 export default function FileUpload() {
 	const [ stage, setStage ] = useState("LOADING_FFMPEG");
 	const [ error, setError ] = useState();
+	const [ clipNo, setClipNo ] = useState<number>();
 	const [ finalBlob, setFinalBlob ] = useState<string>();
 	const ffmpegRef = useRef(new FFmpeg());
 
@@ -14,9 +15,19 @@ export default function FileUpload() {
 	async function loadFFmpeg() {
 		const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.4/dist/esm'
 		const ffmpeg = ffmpegRef.current;
+
+		let n = 0;
 		ffmpeg.on('log', ({ message }) => {
-            console.log(message);
+			if (message.includes("Auto-inserting")) {
+				console.log("Starting clip: " + n)
+				if (n > 0) {
+					console.log("Deleting finished file: " + (n-1));
+					ffmpeg.deleteFile(`input${n-1}.mp4`);
+				}
+				n++;
+			}
         });
+
 		await ffmpeg.load({
 			coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
 			wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
@@ -26,38 +37,56 @@ export default function FileUpload() {
 
 
 	async function concat(files: File[]) {
+		const ffmpeg = ffmpegRef.current;
 		try {
-			const ffmpeg = ffmpegRef.current;
 			setStage("PROCESSING")
 
 
 			let str = "";
+			console.log("Loading files into VFS...")
+			let n = 0;
 			for (let i = 0; i < files.length; i++) {
-
+				console.log("Loading clip: " + n);
+ 
 				str = str + `file 'input${i}.mp4'\n`;
 
-				await ffmpeg.writeFile(`input${i}.mp4`, await fetchFile(URL.createObjectURL(files[i])));
-
+				await writeFile(ffmpeg, files, n);
+				n++;
 			}
+			console.log("Loaded all clips.  Starting Processing...")
 
 			await ffmpeg.writeFile('list.txt', str);
 			await ffmpeg.exec(['-f', 'concat', '-i', 'list.txt', '-c', 'copy', 'output.mov']);
 
 
-			const data = await ffmpeg.readFile("output.mov")
+			console.log("1-STAGE!!!!!!!")
+			const data: any = await ffmpeg.readFile("output.mov")
+			ffmpeg.terminate();
+			console.log("2-STAGE!!!!!!!")
 			
 			setFinalBlob(URL.createObjectURL(new Blob([data.buffer], {type: 'video/mov'})));
+			console.log("3-STAGE!!!!!!!")
 
 			setStage("DONE")
+			console.log("Done!")
 		} catch (e: any) {
-			setError(e);
+			// setError(e);
+			console.log(e)
+			ffmpeg.terminate();
 		}
 	}
 
 
-  useEffect(() => {
-    loadFFmpeg();
-  }, [])
+	async function writeFile(ffmpeg: FFmpeg, files: File[], i: number) {
+		const url = URL.createObjectURL(files[i]);
+		await ffmpeg.writeFile(`input${i}.mp4`, await fetchFile(url));
+		URL.revokeObjectURL(url);
+	}
+
+
+	useEffect(() => {
+		loadFFmpeg();
+	}, [])
 
 
 	return (

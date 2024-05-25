@@ -1,9 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CtaButton from "./CtaButton";
+import ThumbnailBox from "./ThumbnailBox";
+import getVideoCover from "~/utils/thumbnail";
 
 export default function Dropper(props: { onSubmit: any, isLoaded: boolean }) {
 
 	const [ files, setFiles ] = useState<File[]>([]);
+	const [ thumbs, setThumbs ] = useState<string[]>([]);
+
+	// Sequentially process the thumbnails to avoid crashing
+	useEffect(() => {
+		async function handle() {
+			setThumbs((t) => []);
+
+			for (let i = 0; i < files.length; i++) {
+				const url = URL.createObjectURL(await getVideoCover(files[i]));
+				setThumbs((t) => [...t, url])
+			}
+		}
+		handle();
+	}, [files])
 
 	return (
 		<form>
@@ -26,16 +42,8 @@ export default function Dropper(props: { onSubmit: any, isLoaded: boolean }) {
 			{files &&
 				<div className="flex gap-2 mt-2 overflow-x-auto">
 
-					{files.map((f) =>
-						<div
-							key={f.name}
-							className="flex flex-col w-max text-center align-center bg-gray-300 rounded-2xl border-2 border-gray-400 px-3 py-2 min-w-max"
-						>
-							<video src={URL.createObjectURL(f)} width={120}
-								className="rounded-2xl mx-auto"
-							/>
-							<p className="text-xs mt-1">{f.name}</p>
-						</div>
+					{files.map((f, i) =>
+						<ThumbnailBox name={f.name} thumb={thumbs[i]}/>
 					)}
 
 				</div>
