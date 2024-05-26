@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import CtaButton from "./CtaButton";
 import ThumbnailBox from "./ThumbnailBox";
 import getVideoCover from "~/utils/thumbnail";
+import getAllFileEntries from "~/utils/dragndrop";
 
 export default function Dropper(props: { onSubmit: any, isLoaded: boolean }) {
 
@@ -53,12 +54,13 @@ export default function Dropper(props: { onSubmit: any, isLoaded: boolean }) {
 					e.stopPropagation();
 					dropAreaRef.current!.style.backgroundColor = ""
 				}}
-				onDrop={(e) => {
+				onDrop={async (e) => {
 					e.preventDefault();
 					e.stopPropagation();
 					dropAreaRef.current!.style.backgroundColor = ""
 
-					setFiles((f) => [...f, ...Array.from(e.dataTransfer.files)]);
+					const files = await getAllFileEntries(e.dataTransfer.items);
+					setFiles((f) => [...f, ...Array.from(files)]);
 				}}
 
 			>

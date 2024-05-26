@@ -106,7 +106,7 @@ export default function FileUpload() {
 							<p className="font-bold text-lg">Video Processing</p>
 							<p className="mb-8">Your device is currently processing the video locally.</p>
 
-							<div className="bg-blue-100 rounded-3xl p-5 flex flex-col gap-2 mb-5">
+							<div className="bg-blue-100 rounded-3xl p-5 flex flex-col gap-2 mb-2">
 
 								<ProgressType label="Loading Files" current={clipNo} total={totalClips} done={stage == "PROCESSING"} notStarted={false}/>
 								<ProgressType label="Processing" current={clipNo} total={totalClips} done={clipNo == totalClips} notStarted={stage == "LOADING_FILES"}/>

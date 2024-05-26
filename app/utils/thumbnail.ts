@@ -33,8 +33,6 @@ export default function getVideoCover(file: File, seekTo = 0.1) {
                 ctx!.drawImage(videoPlayer, 0, 0, canvas.width, canvas.height);
                 // return the canvas image as a blob
 
-				URL.revokeObjectURL(url);
-
                 ctx!.canvas.toBlob(
                     blob => {
                         resolve(blob!);
@@ -42,6 +40,10 @@ export default function getVideoCover(file: File, seekTo = 0.1) {
                     "image/jpeg",
                     0.75 /* quality */
                 );
+
+                setTimeout(() => {
+                    URL.revokeObjectURL(url);
+                }, 100)
             });
         });
     });
