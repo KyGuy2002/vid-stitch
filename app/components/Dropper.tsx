@@ -125,7 +125,7 @@ export default function Dropper(props: { onSubmit: any, isLoaded: boolean }) {
 			}
 
 			<p className="mt-3 text-sm">All files must be same type and resolution.  1.8 GB max total.</p>
-			<p className="text-sm">(4 days of Wyze SD card footage)</p>
+			<p className="text-sm">(~4 hours of Wyze SD card footage)</p>
 
 		</form>
 	);
