@@ -29,6 +29,14 @@ export default function Dropper(props: { onSubmit: any, isLoaded: boolean }) {
 		inputRef.current.setAttribute("directory", "");
 		inputRef.current.setAttribute("webkitdirectory", "");
 	}, [inputRef])
+	
+	function getSize() {
+		let total = 0;
+		for (let i = 0; i < files.length; i++) {
+			total = total + ((files[i].size / 1048576) / 1024);
+		}
+		return total;
+	}
 
 	return (
 		<form>
@@ -92,33 +100,32 @@ export default function Dropper(props: { onSubmit: any, isLoaded: boolean }) {
 
 			</label>
 
-			{files &&
-				<>{ // 10 or less files displays gallery
-					files.length <= 10 &&
-						<div className="flex gap-2 mt-2 overflow-x-auto hide-scrollbar">
+			{files && files.length > 0 && files.length <= 10 && // 10 or less files displays gallery
+				<div className="flex gap-2 mt-2 overflow-x-auto hide-scrollbar">
 
-							{files.map((f, i) =>
-								<ThumbnailBox key={f.name} name={f.name} thumb={thumbs[i]}/>
-							)}
+					{files.map((f, i) =>
+						<ThumbnailBox key={f.name} name={f.name} thumb={thumbs[i]}/>
+					)}
 
-						</div>
-				}
-				{ // More than 10 just says total with 1 thumbnail
-					files.length > 10 &&
-						<p className="font-semibold text-sm mt-1.5">{files.length} files selected</p>
-				}
-				</>
+				</div>
 			}
 
-			{(props.isLoaded && (files && files.length > 1)) && 
+			<p className='font-semibold text-sm mt-4'>{files.length} files selected - {getSize().toFixed(2)} GB total (1.8 GB max)</p>
+
+			{getSize() > 1.80 &&
+				<p className="text-red-700 mt-3 text-lg font-bold">Files exceed 1.8 GB max size</p>	
+			}
+
+			{(props.isLoaded && (files && files.length > 1) && (getSize() <= 1.80)) && 
 				<CtaButton text="Stitch" onClick={() => props.onSubmit(files)}/>
 			}
 
 			{!props.isLoaded &&
-				<CtaButton text="Downloading Code" disabled={true}/>
+				<p className="mt-3 text-md font-bold">Downloading FFmpeg...  Please wait.</p>
 			}
 
-			<p className="mt-3 text-sm">All files must be same type, resolution, and length</p>
+			<p className="mt-3 text-sm">All files must be same type and resolution.  1.8 GB max total.</p>
+			<p className="text-sm">(4 days of Wyze SD card footage)</p>
 
 		</form>
 	);
