@@ -90,7 +90,7 @@ export default function Dropper(props: { onSubmit: any, isLoaded: boolean }) {
 					<label className="rounded-2xl border-blue-800 border-2 w-max px-5 py-1 text-blue-800 font-bold hover:bg-blue-300 cursor-pointer">
 						Add Files
 						
-						<input style={{ display: "none" }} type="file" id="file-picker" multiple onChange={(evt) => {
+						<input style={{ display: "none" }} type="file" id="file-picker" accepts="video/*" multiple onChange={(evt) => {
 							if (evt.target.files?.length == 0) return;
 							setFiles((f) => [...f, ...Array.from(evt.target.files!)]);
 						}}/>
